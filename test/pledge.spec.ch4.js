@@ -128,7 +128,7 @@ describe('Chapter 4: Promise Chaining and Transformation', function() {
                 expect(promiseB).toRejectWith('shade', done);
             }, FAST_TIMEOUT);
 
-            xit("if pA's error handler throws a reason `e`, pB is rejected with `e`", function(done) {
+            it("if pA's error handler throws a reason `e`, pB is rejected with `e`", function(done) {
                 var promiseB = promiseA.catch(thisThrowsShade);
                 promiseA._internalReject();
                 expect(promiseB).toRejectWith('shade', done);

@@ -46,25 +46,30 @@ $Promise.prototype._callHandlers = function() {
     if (this._state === 'fulfilled') {
         groups.forEach(obj => {
             try {
-                obj.successCb(value)
+                obj.downstreamPromise._internalResolve(obj.successCb(value));
             } catch (e) {
                 if (e instanceof TypeError)
                     obj.downstreamPromise._internalResolve(value);
                 else
                     obj.downstreamPromise._internalReject(e);
             }
-            //obj.downstreamPromise._internalResolve(obj.successCb(value));
         })
-
-
-        // groups.forEach(obj => obj.successCb ? obj.downstreamPromise._internalResolve(obj.successCb(value)) : obj.downstreamPromise._internalResolve(value));
         this._handlerGroups = [];
     } else if (this._state === 'rejected') {
-        groups.forEach(obj => obj.errorCb ? obj.downstreamPromise._internalResolve(obj.errorCb(value)) : obj.downstreamPromise._internalReject(value));
-        this._handlerGroups = [];
-    }
-};
+        groups.forEach(obj => {
+            try {
+                obj.downstreamPromise._internalResolve(obj.errorCb(value));
+            } catch (e) {
+                if (e instanceof TypeError)
+                    obj.downstreamPromise._internalReject(value);
+                else
+                    obj.downstreamPromise._internalReject(e);
+            }
+            this._handlerGroups = [];
+        })
 
+    }
+}
 $Promise.prototype.catch = function(CALLBACK) {
     return this.then(null, CALLBACK);
 }
